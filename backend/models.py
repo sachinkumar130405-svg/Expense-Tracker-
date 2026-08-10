@@ -7,6 +7,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(255), nullable=False)
     email = Column(String(255), unique=True, index=True, nullable=False)
+    password_hash = Column(String(255), nullable=True)
 
 class Category(Base):
     __tablename__ = "categories"
@@ -20,6 +21,7 @@ class Expense(Base):
     amount = Column(DECIMAL(10, 2), nullable=False)
     description = Column(Text)
     date = Column(TIMESTAMP, server_default=func.now())
+    is_income = Column(Boolean, default=False)
     category_id = Column(Integer, ForeignKey("categories.id", ondelete="SET NULL"))
     paid_by = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
 
@@ -29,7 +31,7 @@ class Expense(Base):
 class Allowance(Base):
     __tablename__ = "allowances"
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True) # Optional for MVP
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
     month = Column(Integer, nullable=False)
     year = Column(Integer, nullable=False)
     initial_balance = Column(DECIMAL(10, 2), nullable=False)
