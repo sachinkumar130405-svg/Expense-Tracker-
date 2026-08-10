@@ -28,3 +28,24 @@ class Category(CategoryBase):
 
     class Config:
         from_attributes = True
+
+class AllowanceBase(BaseModel):
+    month: int
+    year: int
+    initial_balance: Decimal
+
+class AllowanceCreate(AllowanceBase):
+    pass
+
+class Allowance(AllowanceBase):
+    id: int
+    user_id: Optional[int] = None
+
+    class Config:
+        from_attributes = True
+
+class Summary(BaseModel):
+    total_expenses: Decimal
+    allowance: Decimal
+    balance: Decimal
+    percentage_used: Decimal

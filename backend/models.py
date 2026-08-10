@@ -25,3 +25,11 @@ class Expense(Base):
 
     category = relationship("Category")
     user = relationship("User")
+
+class Allowance(Base):
+    __tablename__ = "allowances"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True) # Optional for MVP
+    month = Column(Integer, nullable=False)
+    year = Column(Integer, nullable=False)
+    initial_balance = Column(DECIMAL(10, 2), nullable=False)
