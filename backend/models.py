@@ -33,3 +33,14 @@ class Allowance(Base):
     month = Column(Integer, nullable=False)
     year = Column(Integer, nullable=False)
     initial_balance = Column(DECIMAL(10, 2), nullable=False)
+
+class ExpenseSplit(Base):
+    __tablename__ = "expense_splits"
+    id = Column(Integer, primary_key=True, index=True)
+    expense_id = Column(Integer, ForeignKey("expenses.id", ondelete="CASCADE"))
+    owed_by = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    amount = Column(DECIMAL(10, 2), nullable=False)
+    is_settled = Column(Boolean, default=False)
+    
+    expense = relationship("Expense")
+    debtor = relationship("User")

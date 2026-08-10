@@ -26,11 +26,80 @@ def read_root():
 
 @app.post("/expenses/", response_model=schemas.Expense)
 def create_expense(expense: schemas.ExpenseCreate, db: Session = Depends(get_db)):
-    db_expense = models.Expense(**expense.model_dump())
+    expense_data = expense.model_dump(exclude={"splits"})
+    db_expense = models.Expense(**expense_data)
     db.add(db_expense)
     db.commit()
     db.refresh(db_expense)
+    
+    if expense.splits:
+        for split in expense.splits:
+            db_split = models.ExpenseSplit(
+                expense_id=db_expense.id,
+                owed_by=split.owed_by,
+                amount=split.amount
+            )
+            db.add(db_split)
+        db.commit()
+
     return db_expense
+
+@app.get("/debts/", response_model=List[schemas.DebtSummary])
+def get_debts(current_user_id: int = 1, db: Session = Depends(get_db)): # Hardcoding user 1 for MVP
+    # Get all other users
+    users = db.query(models.User).filter(models.User.id != current_user_id).all()
+    
+    debt_summaries = []
+    for user in users:
+        # Amount they owe me (I paid, they are owed_by in splits)
+        owed_to_me = db.query(func.sum(models.ExpenseSplit.amount))\
+            .join(models.Expense, models.ExpenseSplit.expense_id == models.Expense.id)\
+            .filter(
+                models.Expense.paid_by == current_user_id,
+                models.ExpenseSplit.owed_by == user.id,
+                models.ExpenseSplit.is_settled == False
+            ).scalar() or 0
+            
+        # Amount I owe them (They paid, I am owed_by in splits)
+        i_owe = db.query(func.sum(models.ExpenseSplit.amount))\
+            .join(models.Expense, models.ExpenseSplit.expense_id == models.Expense.id)\
+            .filter(
+                models.Expense.paid_by == user.id,
+                models.ExpenseSplit.owed_by == current_user_id,
+                models.ExpenseSplit.is_settled == False
+            ).scalar() or 0
+            
+        if owed_to_me > 0 or i_owe > 0:
+            debt_summaries.append({
+                "user_id": user.id,
+                "user_name": user.name,
+                "amount_owed_to_me": owed_to_me,
+                "amount_i_owe": i_owe
+            })
+            
+    return debt_summaries
+
+@app.post("/debts/settle/{other_user_id}")
+def settle_debts(other_user_id: int, current_user_id: int = 1, db: Session = Depends(get_db)):
+    # Mark debts where I paid and they owe me as settled
+    db.query(models.ExpenseSplit)\
+        .join(models.Expense, models.ExpenseSplit.expense_id == models.Expense.id)\
+        .filter(
+            models.Expense.paid_by == current_user_id,
+            models.ExpenseSplit.owed_by == other_user_id
+        ).update({"is_settled": True})
+        
+    # Mark debts where they paid and I owe them as settled
+    db.query(models.ExpenseSplit)\
+        .join(models.Expense, models.ExpenseSplit.expense_id == models.Expense.id)\
+        .filter(
+            models.Expense.paid_by == other_user_id,
+            models.ExpenseSplit.owed_by == current_user_id
+        ).update({"is_settled": True})
+        
+    db.commit()
+    return {"message": "Debts settled successfully"}
+
 
 @app.get("/expenses/", response_model=List[schemas.Expense])
 def read_expenses(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):

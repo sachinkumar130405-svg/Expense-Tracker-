@@ -36,6 +36,11 @@ CREATE TABLE expense_splits (
     is_settled BOOLEAN DEFAULT false
 );
 
+-- Insert default users for MVP
+INSERT INTO users (id, name, email) VALUES
+    (1, 'Sachin Kumar', 'sachin@example.com'),
+    (2, 'Roommate', 'roommate@example.com');
+
 -- Insert default categories
 INSERT INTO categories (name, is_default) VALUES
     ('Food', true),
