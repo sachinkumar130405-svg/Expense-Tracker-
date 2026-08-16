@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 from datetime import date, datetime, timedelta
-from sqlalchemy import func
+from sqlalchemy import func, cast, Date
 import bcrypt
 
 import models
@@ -261,7 +261,7 @@ def get_chart_data(user_id: int = None, period: str = "month", db: Session = Dep
     if period == "week":
         start = today - timedelta(days=6)
         query = db.query(
-            func.strftime('%Y-%m-%d', models.Expense.date).label("day"),
+            cast(models.Expense.date, Date).label("day"),
             func.sum(models.Expense.amount).label("total")
         ).filter(
             func.date(models.Expense.date) >= start,
@@ -271,7 +271,7 @@ def get_chart_data(user_id: int = None, period: str = "month", db: Session = Dep
             query = query.filter(models.Expense.paid_by == user_id)
         rows = query.group_by("day").order_by("day").all()
 
-        day_map = {r.day: float(r.total) for r in rows}
+        day_map = {str(r.day)[:10]: float(r.total) for r in rows}
         result = []
         for i in range(7):
             d = start + timedelta(days=i)
@@ -283,7 +283,7 @@ def get_chart_data(user_id: int = None, period: str = "month", db: Session = Dep
         # Monthly: last 30 days, day-wise
         start = today - timedelta(days=29)
         query = db.query(
-            func.strftime('%Y-%m-%d', models.Expense.date).label("day"),
+            cast(models.Expense.date, Date).label("day"),
             func.sum(models.Expense.amount).label("total")
         ).filter(
             func.date(models.Expense.date) >= start,
@@ -293,7 +293,7 @@ def get_chart_data(user_id: int = None, period: str = "month", db: Session = Dep
             query = query.filter(models.Expense.paid_by == user_id)
         rows = query.group_by("day").order_by("day").all()
 
-        day_map = {r.day: float(r.total) for r in rows}
+        day_map = {str(r.day)[:10]: float(r.total) for r in rows}
         daily_data = []
         for i in range(30):
             d = start + timedelta(days=i)
