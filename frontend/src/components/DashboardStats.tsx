@@ -139,7 +139,21 @@ export default function DashboardStats() {
           <span className="stat-value accent">₹{summary.total_expenses.toFixed(0)}</span>
         </div>
         <div className="stat-card">
-          <span className="stat-label">Allowance + Receive</span>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span className="stat-label">Allowance + Receive</span>
+            {(summary.allowance > 0 || (summary.total_income && summary.total_income > 0)) && (
+              <button 
+                onClick={() => {
+                  setNewAllowance(summary.allowance > 0 ? summary.allowance.toString() : "");
+                  setIsSettingAllowance(true);
+                }} 
+                style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '0.9rem' }}
+                title="Edit Budget"
+              >
+                ✏️
+              </button>
+            )}
+          </div>
           {summary.allowance > 0 || (summary.total_income && summary.total_income > 0) ? (
             <span className="stat-value purple">
               ₹{((summary.allowance || 0) + (summary.total_income || 0)).toFixed(0)}

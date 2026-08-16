@@ -15,6 +15,7 @@ export default function HistoryPage() {
     total_expenses: 0, allowance: 0, balance: 0, percentage_used: 0, total_income: 0
   });
   const [pieData, setPieData] = useState<{label: string, total: number}[]>([]);
+  const [expenses, setExpenses] = useState<any[]>([]);
   const pieCanvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -37,6 +38,12 @@ export default function HistoryPage() {
     fetch(`${API}/expenses/category-breakdown/?month=${month}&year=${year}${userId ? `&user_id=${userId}` : ""}`)
       .then(r => r.json())
       .then(data => setPieData(data.map((d: any) => ({ label: d.label, total: Number(d.total) }))))
+      .catch(console.error);
+      
+    // Fetch expenses
+    fetch(`${API}/expenses/?month=${month}&year=${year}${userId ? `&user_id=${userId}` : ""}`)
+      .then(r => r.json())
+      .then(data => setExpenses(data.map((e: any) => ({ ...e, amount: Number(e.amount) }))))
       .catch(console.error);
   }, [month, year]);
 
@@ -143,6 +150,46 @@ export default function HistoryPage() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="card" style={{ marginTop: "var(--spacing-md)" }}>
+        <h3 className="card-title">Monthly Transactions</h3>
+        {expenses.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-state-icon">📭</div>
+            <p className="empty-state-text">No expenses logged for this month</p>
+          </div>
+        ) : (
+          <table className="expense-table">
+            <thead>
+              <tr>
+                <th>Details</th>
+                <th>Category</th>
+                <th style={{ textAlign: "right" }}>Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {expenses.map(exp => (
+                <tr key={exp.id}>
+                  <td>
+                    <div className="expense-detail-date">
+                      {new Date(exp.date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                    </div>
+                    <div className="expense-detail-desc">{exp.description || "—"}</div>
+                  </td>
+                  <td>
+                    <span className="category-badge">{exp.category_name || "Uncategorized"}</span>
+                  </td>
+                  <td style={{ textAlign: "right" }}>
+                    <span className="expense-amount" style={{ color: exp.is_income ? "var(--green)" : "var(--accent)" }}>
+                      {exp.is_income ? "+" : "-"}₹{exp.amount.toFixed(2)}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </>
   );

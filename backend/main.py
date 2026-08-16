@@ -164,10 +164,15 @@ def create_expense(expense: schemas.ExpenseCreate, db: Session = Depends(get_db)
     )
 
 @app.get("/expenses/", response_model=List[schemas.Expense])
-def read_expenses(user_id: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+def read_expenses(user_id: int = None, month: int = None, year: int = None, skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     query = db.query(models.Expense)
     if user_id:
         query = query.filter(models.Expense.paid_by == user_id)
+    if month and year:
+        query = query.filter(
+            func.extract('month', models.Expense.date) == month,
+            func.extract('year', models.Expense.date) == year
+        )
     expenses = query.order_by(models.Expense.date.desc()).offset(skip).limit(limit).all()
     result = []
     for exp in expenses:
