@@ -29,9 +29,20 @@ def startup_event():
     # Check and insert default users
     if not db.query(models.User).first():
         db.add_all([
-            models.User(id=1, name='Sachin Kumar', email='sachin@example.com', password_hash=get_password_hash('password123')),
-            models.User(id=2, name='Roommate', email='roommate@example.com', password_hash=get_password_hash('password123'))
+            models.User(name='Sachin Kumar', email='sachin@example.com', password_hash=get_password_hash('password123')),
+            models.User(name='Roommate', email='roommate@example.com', password_hash=get_password_hash('password123'))
         ])
+        db.commit()
+
+    # Fix sequences if postgres
+    from database import engine
+    from sqlalchemy import text
+    if "postgres" in engine.url.drivername:
+        try:
+            db.execute(text("SELECT setval('users_id_seq', COALESCE((SELECT MAX(id)+1 FROM users), 1), false);"))
+            db.commit()
+        except Exception:
+            db.rollback()
     
     # Check and insert default categories
     if not db.query(models.Category).first():
