@@ -13,7 +13,7 @@ interface Expense {
   date: string;
   category_id: number;
   category_name: string | null;
-  is_income?: boolean;
+  is_income: boolean;
 }
 
 export default function Home() {
