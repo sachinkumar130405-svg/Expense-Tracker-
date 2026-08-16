@@ -60,6 +60,15 @@ export default function DashboardStats() {
   }, [chartPeriod]);
 
   useEffect(() => {
+    if (isSettingAllowance) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isSettingAllowance]);
+
+  useEffect(() => {
     const userId = localStorage.getItem("user_id");
     fetch(`${API}/expenses/category-breakdown/${userId ? `?user_id=${userId}` : ""}`)
       .then(r => r.json())

@@ -84,6 +84,15 @@ export default function ExpenseForm({ isOpen, onClose, onSaved, editExpense }: E
     }
   }, [editExpense, isOpen, categories]);
 
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
   const handleAddCategory = async () => {
     if (!newCategoryName.trim()) return;
     try {
