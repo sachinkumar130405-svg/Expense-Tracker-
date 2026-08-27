@@ -5,14 +5,14 @@ It focuses on rapid transaction entry, shared expenses/split bills, and tracking
 
 ## Features
 
-- **Dark Mode UI:** High-contrast, dynamic aesthetic that feels premium.
+- **Light & Dark Mode UI:** Premium, glassmorphic aesthetic with a seamless toggle between high-contrast dark and soft light themes.
 - **Quick-Add Expense:** Log micro-transactions in under 5 seconds with pre-defined amount chips (e.g. ₹20, ₹50).
 - **Custom College Categories:** Relevant categories like Food, Transport, and Academics.
 - **Receive & Expense Tracking:** Differentiate between spending and receiving money with visual indicators.
 - **Monthly Budgeting:** Set your monthly allowance and track your spending with a color-coded visual indicator.
-- **Multi-User Support:** User scoping ensures that your expenses and data are securely isolated to your account.
-- **Dynamic Charts:** View weekly and monthly spending trends with responsive bar charts and categorized pie charts.
-- **Historical Data:** Navigate through past months to view summaries and breakdowns of previous expenses.
+- **Multi-User Support:** User scoping with auth guards ensures that your expenses and data are securely isolated to your account.
+- **Dynamic Charts:** View weekly and monthly spending trends (with day-of-week tracking) using responsive bar charts and categorized pie charts.
+- **Historical Data & Filtering:** Navigate past months to view summaries, a category-by-category bar chart comparison, and filter your transaction history by specific categories.
 
 ## Technology Stack
 
