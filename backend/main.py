@@ -298,8 +298,8 @@ def get_chart_data(user_id: int = None, period: str = "month", db: Session = Dep
         for i in range(30):
             d = start + timedelta(days=i)
             key = d.strftime('%Y-%m-%d')
-            label = d.strftime('%d %b')
-            daily_data.append({"label": label, "total": day_map.get(key, 0)})
+            label = d.strftime('%a')
+            daily_data.append({"label": label, "date": d.strftime('%d'), "total": day_map.get(key, 0)})
             
         # Weekly summary (last 4 weeks)
         weekly_summary = []

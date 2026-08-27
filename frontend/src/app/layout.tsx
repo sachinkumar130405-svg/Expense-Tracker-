@@ -1,9 +1,6 @@
-"use client";
-
 import { Inter } from "next/font/google";
-import { usePathname } from "next/navigation";
 import "./globals.css";
-import Sidebar from "@/components/Sidebar";
+import AppShell from "@/components/AppShell";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -11,9 +8,6 @@ const inter = Inter({
 });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isLoginPage = pathname === "/login";
-
   return (
     <html lang="en" className={inter.variable}>
       <head>
@@ -22,12 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
       </head>
       <body>
-        <div className="app-layout">
-          {!isLoginPage && <Sidebar />}
-          <main className={isLoginPage ? "" : "main-content"} style={isLoginPage ? { width: "100%", padding: 0 } : {}}>
-            {children}
-          </main>
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

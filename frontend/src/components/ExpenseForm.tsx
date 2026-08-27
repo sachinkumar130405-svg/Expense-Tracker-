@@ -44,6 +44,14 @@ export default function ExpenseForm({ isOpen, onClose, onSaved, editExpense }: E
   // Income vs Expense
   const [isIncome, setIsIncome] = useState(false);
 
+  // Helper to get current datetime in YYYY-MM-DDTHH:MM format for datetime-local input
+  const getCurrentDateTimeLocal = () => {
+    const now = new Date();
+    const offset = now.getTimezoneOffset();
+    const local = new Date(now.getTime() - offset * 60000);
+    return local.toISOString().slice(0, 16);
+  };
+
   const now = new Date();
   const dateDisplay = now.toLocaleDateString("en-IN", {
     weekday: "short", day: "numeric", month: "short", year: "numeric",
@@ -51,6 +59,14 @@ export default function ExpenseForm({ isOpen, onClose, onSaved, editExpense }: E
   const timeDisplay = now.toLocaleTimeString("en-IN", {
     hour: "2-digit", minute: "2-digit",
   });
+
+  // When manual date is toggled on, pre-fill with current datetime
+  const handleManualToggle = (checked: boolean) => {
+    setIsManualDate(checked);
+    if (checked && !manualDate) {
+      setManualDate(getCurrentDateTimeLocal());
+    }
+  };
 
   useEffect(() => {
     fetch(`${API}/categories/`)
@@ -200,7 +216,7 @@ export default function ExpenseForm({ isOpen, onClose, onSaved, editExpense }: E
                 <input 
                   type="checkbox" 
                   checked={isManualDate} 
-                  onChange={e => setIsManualDate(e.target.checked)} 
+                  onChange={e => handleManualToggle(e.target.checked)} 
                   style={{ width: "auto", marginRight: "4px" }} 
                 />
                 Manual

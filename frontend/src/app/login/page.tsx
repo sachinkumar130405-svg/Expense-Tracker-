@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -12,6 +13,12 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    // Apply saved theme on login page too
+    const savedTheme = localStorage.getItem("theme") || "dark";
+    document.documentElement.setAttribute("data-theme", savedTheme);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,19 +76,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{
-      display: "flex", 
-      flexDirection: "column", 
-      alignItems: "center", 
-      justifyContent: "center", 
-      minHeight: "100vh",
-      background: "var(--bg-deep)",
-      padding: "var(--spacing-xl)"
-    }}>
-      <div className="card" style={{ width: "100%", maxWidth: "400px", padding: "var(--spacing-2xl)" }}>
-        <div style={{ textAlign: "center", marginBottom: "var(--spacing-xl)" }}>
-          <span className="brand-icon" style={{ color: "var(--accent)", fontSize: "2.5rem" }}>⟐</span>
-          <h1 style={{ letterSpacing: "3px", textTransform: "uppercase", marginTop: "var(--spacing-sm)" }}>
+    <div className="login-container">
+      <div className="login-theme-toggle">
+        <ThemeToggle />
+      </div>
+
+      <div className="card login-card">
+        <div className="login-brand">
+          <span className="brand-icon">⟐</span>
+          <h1>
             EXPENSE <span style={{ color: "var(--accent)" }}>TRACKER</span>
           </h1>
         </div>

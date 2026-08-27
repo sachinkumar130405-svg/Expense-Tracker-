@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import ThemeToggle from "./ThemeToggle";
 
 const NAV_ITEMS = [
   { href: "/", label: "Home", icon: "🏠" },
@@ -51,6 +52,8 @@ export default function Sidebar() {
           </Link>
         ))}
       </nav>
+
+      <ThemeToggle />
 
       <div className="sidebar-user" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div>

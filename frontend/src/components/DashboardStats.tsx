@@ -4,11 +4,12 @@ import { useState, useEffect, useRef } from "react";
 
 const API = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-const PIE_COLORS = ["#00d4aa", "#bb86fc", "#e040fb", "#ff9800", "#448aff", "#69f0ae", "#ff5252", "#00bcd4"];
+const PIE_COLORS = ["#7692FF", "#BDB2FF", "#e040fb", "#ff9800", "#448aff", "#69f0ae", "#ff5252", "#00bcd4"];
 
 interface ChartPoint {
   label: string;
   total: number;
+  date?: string;
 }
 
 interface SummaryData {
@@ -49,7 +50,7 @@ export default function DashboardStats() {
       .then(r => r.json())
       .then(data => {
         if (chartPeriod === "month") {
-          setBarData(data.daily.map((d: any) => ({ label: d.label, total: Number(d.total) })));
+          setBarData(data.daily.map((d: any) => ({ label: d.label, date: d.date, total: Number(d.total) })));
           setWeeklySummary(data.weekly.map((d: any) => ({ label: d.label, total: Number(d.total) })));
         } else {
           setBarData(data.map((d: any) => ({ label: d.label, total: Number(d.total) })));
